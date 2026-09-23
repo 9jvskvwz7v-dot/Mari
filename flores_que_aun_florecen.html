@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para ti</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     CONFIG — edita solo este bloque para cambiar los textos.
+     ============================================================ */
+  :root{
+    --intro-title: "Para ti";
+    --intro-text: "Un ramo pequeño, con cosas que no siempre supe decir bien.";
+    --hint: "toca el lirio que brilla";
+    --letter-title: "Mi hermosa ricitos de oro";
+    --letter-p1: "Así te decía, y no era solo por el pelo. Eras luz en cualquier lugar donde estuvieras.";
+    --letter-p2: "Sigo pensando que eres la persona que más he amado en mi vida. Y una parte de mí probablemente siempre lo va a hacer.";
+    --letter-p3: "No escribo esto para pedirte que vuelvas. Lo escribo porque necesitaba que lo supieras, aunque sea una vez más.";
+    --letter-p4: "Aunque ahora no somos nada, pero, te quiero decir que sí te quiero, y que a veces también te amo.";
+    --closing-line: "Gracias por haber sido mi ricitos de oro.";
+    --signature: "— Alejo";
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+
+  html, body {
+    background: #17141f;
+    font-family: 'Nunito Sans', sans-serif;
+    color: #f6ecd9;
+    overflow-x: hidden;
+  }
+
+  .scene {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    background: radial-gradient(ellipse at 50% 30%, #2c2438 0%, #1c1826 55%, #100d16 100%);
+    padding: env(safe-area-inset-top,0px) 20px calc(env(safe-area-inset-bottom,0px) + 40px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 20%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.5px 1.5px at 70% 12%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 40% 28%, rgba(255,255,255,.28), transparent),
+      radial-gradient(1px 1px at 85% 8%, rgba(255,255,255,.32), transparent),
+      radial-gradient(1.5px 1.5px at 55% 60%, rgba(255,255,255,.3), transparent),
+      radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,.25), transparent),
+      radial-gradient(1px 1px at 93% 55%, rgba(255,255,255,.25), transparent);
+    opacity: .8;
+    pointer-events: none;
+  }
+
+  .firefly {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #ffe89a;
+    box-shadow: 0 0 6px 2px rgba(255,232,154,.7);
+    opacity: 0;
+    animation: fly 8s ease-in-out infinite;
+  }
+  @keyframes fly {
+    0%   { opacity: 0; transform: translate(0,0); }
+    10%  { opacity: .9; }
+    50%  { transform: translate(var(--fx,20px), var(--fy,-30px)); }
+    90%  { opacity: .7; }
+    100% { opacity: 0; transform: translate(calc(var(--fx,20px) * 1.6), calc(var(--fy,-30px) * 0.3)); }
+  }
+
+  .intro {
+    position: relative;
+    text-align: center;
+    max-width: 480px;
+    margin: 6vh auto 2vh;
+    transition: opacity 1.2s ease;
+    z-index: 2;
+  }
+  .intro.fade { opacity: 0; pointer-events: none; }
+
+  .intro h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 8vw, 3.2rem);
+    letter-spacing: 0.01em;
+    margin-bottom: 14px;
+  }
+  .intro p { font-size: 1.05rem; line-height: 1.6; color: #e9dcc4; }
+  .hint {
+    display: block; margin-top: 22px;
+    font-size: .78rem; letter-spacing: .04em;
+    color: #cbb98f; font-style: italic;
+  }
+
+  /* ---------- bouquet ---------- */
+  .bouquet-stage {
+    position: relative; z-index: 2;
+    width: min(92vw, 400px);
+    aspect-ratio: 1 / 1.15;
+    margin: 1vh auto 0;
+    flex-shrink: 0;
+  }
+
+  .bouquet-flower {
+    position: absolute;
+    width: 42%;
+    aspect-ratio: 1;
+    left: var(--x); top: var(--y);
+    cursor: pointer;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.3) rotate(var(--rot));
+    animation: bloomIn .7s cubic-bezier(.3,1.4,.5,1) forwards;
+    animation-delay: var(--d, 0s);
+    filter: drop-shadow(0 5px 8px rgba(10, 6, 4, .5));
+    transition: transform .25s ease, filter .25s ease;
+  }
+  .bouquet-flower:hover {
+    filter: drop-shadow(0 6px 10px rgba(10,6,4,.6)) brightness(1.06);
+    z-index: 20 !important;
+  }
+  @keyframes bloomIn {
+    to { opacity: 1; transform: translate(-50%, -50%) scale(var(--s, 1)) rotate(var(--rot)); }
+  }
+  .bouquet-flower svg { width: 100%; height: 100%; overflow: visible; }
+
+  .bouquet-flower.locked { pointer-events: none; }
+  .bouquet-flower.active::before {
+    content: ""; position: absolute; inset: -16%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,224,150,.4), transparent 72%);
+    animation: pulseRing 1.6s ease-in-out infinite;
+    z-index: -1; pointer-events: none;
+  }
+  @keyframes pulseRing {
+    0%, 100% { opacity: .35; transform: scale(.88); }
+    50%      { opacity: .8;  transform: scale(1.18); }
+  }
+
+  .msg {
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%) translateY(6px) rotate(calc(var(--rot) * -1));
+    width: min(165px, 46vw); padding: 11px 13px;
+    background: rgba(28,20,34,.95);
+    border: 1px solid rgba(246,236,217,.18);
+    border-radius: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: .95rem; line-height: 1.4;
+    color: #f6ecd9;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+    z-index: 30;
+  }
+  .bouquet-flower.open .msg { opacity: 1; transform: translateX(-50%) translateY(0) rotate(calc(var(--rot) * -1)); }
+
+  .stems {
+    position: absolute; left: 50%; bottom: 14%;
+    width: 2px; height: 30%;
+    transform: translateX(-50%);
+  }
+  .stem-line {
+    position: absolute; bottom: 0; left: 50%;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, #7ea24a, #3f5a26);
+    border-radius: 2px;
+    transform-origin: bottom center;
+  }
+
+  .leaf {
+    position: absolute;
+    width: 15%; height: 7%;
+    background: linear-gradient(120deg, #6b8f3f, #3f5a26);
+    border-radius: 0 100% 0 100%;
+  }
+
+  .wrap-paper {
+    position: absolute; left: 50%; bottom: 0;
+    width: 46%; height: 18%;
+    transform: translateX(-50%);
+    background: linear-gradient(160deg, #cfa562, #9c7038 60%, #7a5528);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  }
+  .ribbon {
+    position: absolute; left: 50%; bottom: 8%;
+    width: 30%; height: 14%;
+    transform: translateX(-50%);
+    background: #b5432f;
+    border-radius: 2px;
+  }
+  .ribbon::before, .ribbon::after {
+    content: ""; position: absolute; top: 50%; width: 26px; height: 20px;
+    background: #b5432f; border-radius: 3px;
+  }
+  .ribbon::before { left: -18px; transform: translateY(-50%) rotate(35deg); }
+  .ribbon::after  { right: -18px; transform: translateY(-50%) rotate(-35deg); }
+
+  .progress {
+    position: relative; z-index: 2;
+    text-align: center;
+    font-size: .78rem; letter-spacing: .04em;
+    color: #cbb98f; margin-top: 3vh;
+  }
+
+  /* ---------- letter scene ---------- */
+  .letter-scene {
+    background: linear-gradient(180deg, #e8b34a 0%, #f3d38a 25%, #faf3e3 100%);
+    color: #3a2f22;
+    padding: 10vh 22px calc(env(safe-area-inset-bottom,0px) + 60px);
+    display: flex; justify-content: center;
+    opacity: 0; max-height: 0; overflow: hidden;
+    transition: opacity 1s ease;
+  }
+  .letter-scene.show { opacity: 1; max-height: none; }
+
+  .letter { max-width: 480px; width: 100%; text-align: left; }
+  .letter h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 500;
+    font-size: 1.9rem; margin-bottom: 20px;
+    text-align: center; color: #6b4a1f;
+  }
+  .letter p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.18rem; line-height: 1.75;
+    margin-bottom: 18px; color: #4a3a26;
+  }
+  .letter .closing {
+    text-align: center; font-style: italic;
+    font-size: 1.25rem; margin: 30px 0 10px; color: #6b4a1f;
+  }
+  .letter .sig {
+    display: block; text-align: center;
+    margin-top: 22px; font-family: 'Nunito Sans', sans-serif;
+    font-size: .85rem; letter-spacing: .05em; color: #8a6a34;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bouquet-flower, .firefly { animation: none !important; opacity: 1 !important; }
+    .bouquet-flower { transform: translate(-50%,-50%) scale(var(--s,1)) rotate(var(--rot)) !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="stars"></div>
+  <div id="fireflies"></div>
+
+  <div class="intro" id="intro">
+    <h1 id="introTitle"></h1>
+    <p id="introText"></p>
+    <span class="hint" id="hintText"></span>
+  </div>
+
+  <div class="bouquet-stage" id="bouquet">
+    <div class="wrap-paper"></div>
+    <div class="ribbon"></div>
+  </div>
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="letter-scene" id="letterScene">
+  <div class="letter">
+    <h2 id="letterTitle"></h2>
+    <p id="p1"></p>
+    <p id="p2"></p>
+    <p id="p3"></p>
+    <p id="p4"></p>
+    <p class="closing" id="closingLine"></p>
+    <span class="sig" id="sig"></span>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // CONFIG — mensajes de cada lirio, y su posición en el ramo.
+  // x / y son porcentajes dentro del ramo; rot es la inclinación;
+  // s es el tamaño relativo; d es el retraso de su animación.
+  // ============================================================
+  const FLOWERS = [
+    { text: "Te quiero, es un poco raro decirlo así porque sí.",                                         x: 50, y: 44, rot: 0,   s: 1.18, d: 0.5,  petal: "#f6c945", petalDark: "#d99a1e" },
+    { text: "A veces también te amo, y eso me asusta un poco.",                                          x: 27, y: 52, rot: -28, s: 0.92, d: 0.15, petal: "#f9d564", petalDark: "#e0ac2a" },
+    { text: "Lo que fuimos no se borra tan fácil, aunque ya esté más olvidado que nunca.",                x: 38, y: 40, rot: -14, s: 1.0,  d: 0.3,  petal: "#f4c23a", petalDark: "#d29418" },
+    { text: "Fuiste, y sigues siendo, mi ricitos de oro.",                                                x: 63, y: 40, rot: 14,  s: 1.0,  d: 0.3,  petal: "#fbdd7c", petalDark: "#e3ba3e" },
+    { text: "Pienso en ti cada día.",                                                                     x: 74, y: 52, rot: 28,  s: 0.92, d: 0.15, petal: "#f7cd52", petalDark: "#d8a52a" },
+    { text: "Extraño hasta las cosas pequeñas.",                                                          x: 33, y: 24, rot: -42, s: 0.78, d: 0.0,  petal: "#f2bd33", petalDark: "#c98e14" },
+    { text: "Vivo por dejarte atrás, porque eras lo que quería, pero no puedo.",                          x: 68, y: 24, rot: 42,  s: 0.78, d: 0.0,  petal: "#f8d06a", petalDark: "#dcac36" },
+    { text: "Aún no sé. No puedo olvidarte; te dejo atrás, pero siempre me alcanzas para que nunca te deje.", x: 50, y: 16, rot: 0,   s: 0.82, d: 0.05, petal: "#fadb84", petalDark: "#e4bd52" }
+  ];
+
+  // Orden en el que se habilitan los lirios (índices sobre FLOWERS).
+  // El 0 (el lirio central, el más grande) queda para el final.
+  const ORDER = [5, 6, 7, 1, 4, 2, 3, 0];
+
+  const val = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim().replace(/^"|"$/g,'');
+
+  document.getElementById('introTitle').textContent = val('--intro-title');
+  document.getElementById('introText').textContent = val('--intro-text');
+  document.getElementById('hintText').textContent = val('--hint');
+  document.getElementById('letterTitle').textContent = val('--letter-title');
+  document.getElementById('p1').textContent = val('--letter-p1');
+  document.getElementById('p2').textContent = val('--letter-p2');
+  document.getElementById('p3').textContent = val('--letter-p3');
+  document.getElementById('p4').textContent = val('--letter-p4');
+  document.getElementById('closingLine').textContent = val('--closing-line');
+  document.getElementById('sig').textContent = val('--signature');
+
+  // fireflies
+  const ffContainer = document.getElementById('fireflies');
+  for (let i = 0; i < 12; i++) {
+    const f = document.createElement('div');
+    f.className = 'firefly';
+    f.style.left = (5 + Math.random() * 90) + '%';
+    f.style.top = (10 + Math.random() * 70) + '%';
+    f.style.setProperty('--fx', (Math.random() * 60 - 30) + 'px');
+    f.style.setProperty('--fy', (Math.random() * -50 - 10) + 'px');
+    f.style.animationDelay = (Math.random() * 8) + 's';
+    f.style.animationDuration = (6 + Math.random() * 5) + 's';
+    ffContainer.appendChild(f);
+  }
+
+  function flowerSVG(id, petal, petalDark) {
+    const petalCount = 6;
+    let petals = '', freckles = '', stamens = '';
+    for (let i = 0; i < petalCount; i++) {
+      const angle = (360 / petalCount) * i;
+      petals += `<g transform="rotate(${angle} 30 30)">
+          <path d="M30 31
+                   C 23 28, 18 21, 18.5 12
+                   C 18.8 6, 23.5 0, 30 -5
+                   C 36.5 0, 41.2 6, 41.5 12
+                   C 42 21, 37 28, 30 31 Z"
+                fill="url(#g${id})" stroke="${petalDark}" stroke-width="0.4"/>
+          <path d="M30 29 C 30 20, 30 8, 30 -3" fill="none" stroke="${petalDark}" stroke-width="0.4" opacity=".5"/>
+        </g>`;
+      freckles += `<g transform="rotate(${angle} 30 30)">
+          <ellipse cx="27" cy="22" rx="0.9" ry="1.4" fill="#7a3a1f" opacity=".8" transform="rotate(-15 27 22)"/>
+          <ellipse cx="30.5" cy="19" rx="0.8" ry="1.3" fill="#7a3a1f" opacity=".75" transform="rotate(10 30.5 19)"/>
+          <ellipse cx="33" cy="23" rx="0.8" ry="1.2" fill="#7a3a1f" opacity=".7" transform="rotate(20 33 23)"/>
+          <circle cx="29" cy="25" r="0.6" fill="#7a3a1f" opacity=".6"/>
+        </g>`;
+      const sAngle = angle + (360 / petalCount) / 2;
+      stamens += `<g transform="rotate(${sAngle} 30 30)">
+          <path d="M30 30 Q 30 8, 30 -8" fill="none" stroke="#8a5a2c" stroke-width="1" stroke-linecap="round"/>
+          <ellipse cx="30" cy="-10" rx="2" ry="4.4" fill="#6e3f1a" transform="rotate(10 30 -10)"/>
+        </g>`;
+    }
+    return `
+      <svg viewBox="0 0 60 60" style="overflow:visible">
+        <defs>
+          <linearGradient id="g${id}" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="${petalDark}"/>
+            <stop offset="40%" stop-color="${petal}"/>
+            <stop offset="100%" stop-color="${petal}"/>
+          </linearGradient>
+        </defs>
+        <g>${petals}</g>
+        <g>${freckles}</g>
+        <g>${stamens}</g>
+        <line x1="30" y1="30" x2="30" y2="16" stroke="#5e8f3a" stroke-width="1.1" stroke-linecap="round"/>
+        <circle cx="30" cy="30" r="2" fill="#c9a24a"/>
+      </svg>`;
+  }
+
+  const bouquet = document.getElementById('bouquet');
+  const intro = document.getElementById('intro');
+  const progress = document.getElementById('progress');
+  const letterScene = document.getElementById('letterScene');
+  let openedCount = 0;
+  const flowerEls = [];
+  progress.textContent = `0 / ${FLOWERS.length}`;
+
+  // a few loose leaves peeking from behind the bundle, drawn first (lowest z)
+  [[18,58,-30],[82,58,30],[30,66,-15],[70,66,15]].forEach(([x,y,r]) => {
+    const leaf = document.createElement('div');
+    leaf.className = 'leaf';
+    leaf.style.left = x + '%';
+    leaf.style.top = y + '%';
+    leaf.style.transform = `translate(-50%,-50%) rotate(${r}deg)`;
+    leaf.style.zIndex = 0;
+    bouquet.appendChild(leaf);
+  });
+
+  FLOWERS.forEach((f, i) => {
+    const el = document.createElement('div');
+    el.className = 'bouquet-flower locked';
+    el.style.setProperty('--x', f.x + '%');
+    el.style.setProperty('--y', f.y + '%');
+    el.style.setProperty('--rot', f.rot + 'deg');
+    el.style.setProperty('--s', f.s);
+    el.style.setProperty('--d', f.d + 's');
+    el.style.zIndex = String(Math.round(f.s * 10));
+    el.innerHTML = flowerSVG(i, f.petal, f.petalDark);
+
+    const msg = document.createElement('div');
+    msg.className = 'msg';
+    msg.textContent = f.text;
+    el.appendChild(msg);
+
+    el.addEventListener('click', () => {
+      if (el.classList.contains('locked')) return;
+      document.querySelectorAll('.bouquet-flower.open').forEach(x => x.classList.remove('open'));
+      el.classList.remove('active');
+      el.classList.add('open');
+      if (!el.dataset.seen) {
+        el.dataset.seen = '1';
+        openedCount++;
+        progress.textContent = `${openedCount} / ${FLOWERS.length}`;
+        seqPos++;
+        if (seqPos < ORDER.length) {
+          flowerEls[ORDER[seqPos]].classList.remove('locked');
+          flowerEls[ORDER[seqPos]].classList.add('active');
+        }
+        if (openedCount === FLOWERS.length) {
+          setTimeout(() => {
+            letterScene.classList.add('show');
+            letterScene.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 600);
+        }
+      }
+      if (!intro.classList.contains('fade')) intro.classList.add('fade');
+    });
+
+    bouquet.appendChild(el);
+    flowerEls[i] = el;
+  });
+
+  let seqPos = 0;
+  flowerEls[ORDER[0]].classList.remove('locked');
+  flowerEls[ORDER[0]].classList.add('active');
+
+</script>
+</body>
+</html>
